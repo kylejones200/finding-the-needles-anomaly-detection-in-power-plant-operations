@@ -1,58 +1,44 @@
+---
+author: "Kyle Jones"
+date_published: "October 6, 2025"
+date_exported_from_medium: "November 10, 2025"
+canonical_link: "https://medium.com/@kyle-t-jones/finding-the-needles-anomaly-detection-in-power-plant-operations-1c5b18e2a56f"
+---
+
 # Finding the Needles: Anomaly Detection in Power Plant Operations Using ensemble machine learning to automatically detect unusual
 emissions, data errors, and equipment malfunctions across 12,000+ U.S...
 
 ### Finding the Needles: Anomaly Detection in Power Plant Operations
 #### *Using ensemble machine learning to automatically detect unusual emissions, data errors, and equipment malfunctions across 12,000+ U.S. power plants*
-Among 12,613 power plants operating in the United States in 2023, which
-ones are behaving abnormally? Which have suspiciously high emissions?
-Which might have reporting errors? Which equipment is showing early
-signs of failure?
+Among 12,613 power plants operating in the United States in 2023, which ones are behaving abnormally? Which have suspiciously high emissions? Which might have reporting errors? Which equipment is showing early signs of failure?
 
 
-Traditional manual auditing is impossible at this scale. But machine
-learning anomaly detection can automatically flag the most unusual 5% of
-plants for investigation --- potentially catching billion-dollar
-problems before they escalate.
+Traditional manual auditing is impossible at this scale. But machine learning anomaly detection can automatically flag the most unusual 5% of plants for investigation --- potentially catching billion-dollar problems before they escalate.
 
-This article demonstrates six different anomaly detection techniques on
-[EPA power plant data](https://www.epa.gov/egrid), then combines them into a robust ensemble that catches
-what individual methods miss.
+This article demonstrates six different anomaly detection techniques on [EPA power plant data](https://www.epa.gov/egrid), then combines them into a robust ensemble that catches what individual methods miss.
 
 
 ### Why Anomaly Detection Matters
-For Regulators: The EPA receives emissions reports from thousands of
-facilities. Manually auditing all of them is impossible. Anomaly
-detection helps prioritize which plants warrant detailed investigation,
-catching misreporting, equipment issues, or compliance violations.
+For Regulators: The EPA receives emissions reports from thousands of facilities. Manually auditing all of them is impossible. Anomaly detection helps prioritize which plants warrant detailed investigation, catching misreporting, equipment issues, or compliance violations.
 
-For Utility Operators: A plant with efficiency 20% below similar
-facilities could have equipment problems. Early detection enables
-predictive maintenance before catastrophic failure, saving millions in
-emergency repairs and lost generation.
+For Utility Operators: A plant with efficiency 20% below similar facilities could have equipment problems. Early detection enables predictive maintenance before catastrophic failure, saving millions in emergency repairs and lost generation.
 
-For Investors: Unusual emissions patterns might indicate operational
-problems, regulatory risk, or aging equipment. This information helps
-assess asset quality and avoid bad investments.
+For Investors: Unusual emissions patterns might indicate operational problems, regulatory risk, or aging equipment. This information helps assess asset quality and avoid bad investments.
 
-For Researchers: Identifying outliers improves data quality for
-analysis. That plant reporting negative emissions? Probably a data entry
-error that would skew your results.
+For Researchers: Identifying outliers improves data quality for analysis. That plant reporting negative emissions? Probably a data entry error that would skew your results.
 
 ### The Challenge: What is "Normal" Anyway?
 Power plants come in wildly different types:
 
 - A 1,000 MW coal plant burning 24/7
-- A 50 MW natural gas peaker running only during summer
-  afternoons
+- A 50 MW natural gas peaker running only during summer afternoons
 - A 2 MW solar farm
 - A 500 MW nuclear plant with 90%+ capacity factor
 
-Comparing them directly makes no sense. We need methods that understand
-context --- what's normal *for plants like this one*.
+Comparing them directly makes no sense. We need methods that understand context --- what's normal *for plants like this one*.
 
 ### The Dataset
-Using [EPA eGRID 2023](https://www.epa.gov/egrid) data with 12,613 plants, we focus on key operational
-metrics:
+Using [EPA eGRID 2023](https://www.epa.gov/egrid) data with 12,613 plants, we focus on key operational metrics:
 
 - Generation (MWh): How much electricity produced
 - CO2 emissions (tons): Total carbon dioxide emitted
@@ -83,26 +69,18 @@ print(f"Analyzing {len(plants_2023):,} plants")
 print(f"Features: carbon_intensity, capacity_factor, log_generation, log_co2")
 ```
 
-*The data and code for this project are in*
-[*Github*](https://github.com/kylejones200/electric_utilities)*.*
+*The data and code for this project are in* [*Github*](https://github.com/kylejones200/electric_utilities)*.*
 
 Some immediate red flags appear in the raw data:
 
-- 47 plants with capacity factor \> 1.0 (physically
-  impossible --- generating more than maximum capacity!)
+- 47 plants with capacity factor \> 1.0 (physically impossible --- generating more than maximum capacity!)
 - 12 plants with negative emissions (data entry errors)
-- 238 plants with carbon intensity \>2.0 tons/MWh (suspiciously high,
-  even for coal)
+- 238 plants with carbon intensity \>2.0 tons/MWh (suspiciously high, even for coal)
 
 ### Method 1: Isolation Forest
-Isolation Forest works on a clever principle: anomalies are easier to
-isolate than normal points. It randomly selects features and split
-values, recursively partitioning the data. Anomalies get isolated in
-fewer splits (shorter tree paths).
+Isolation Forest works on a clever principle: anomalies are easier to isolate than normal points. It randomly selects features and split values, recursively partitioning the data. Anomalies get isolated in fewer splits (shorter tree paths).
 
-Normal points are densely packed --- requires many splits to isolate
-them. Anomalies are in sparse regions --- one or two splits isolate
-them.
+Normal points are densely packed --- requires many splits to isolate them. Anomalies are in sparse regions --- one or two splits isolate them.
 
 ```python
 from sklearn.ensemble import IsolationForest
@@ -126,21 +104,14 @@ plants_2023.loc[X.index, 'iso_score'] = anomaly_scores
 print(f"Detected {(predictions == -1).sum()} anomalies ({(predictions == -1).sum()/len(predictions)*100:.1f}%)")
 ```
 
-Isolation Forest flags 631 plants (5%) as anomalous. The most anomalous
-include:
+Isolation Forest flags 631 plants (5%) as anomalous. The most anomalous include:
 
-- A coal plant with capacity factor of 1.43 (generating 43% more than
-  physically possible --- obvious data error)
-- A natural gas plant with carbon intensity 3.2 tons/MWh (2x typical
-  for gas, suggests coal contamination or CCS issues)
-- A wind farm reporting 10,000 MWh with 100 MW capacity (capacity
-  factor 0.011 --- barely running, potential maintenance issues)
+- A coal plant with capacity factor of 1.43 (generating 43% more than physically possible --- obvious data error)
+- A natural gas plant with carbon intensity 3.2 tons/MWh (2x typical for gas, suggests coal contamination or CCS issues)
+- A wind farm reporting 10,000 MWh with 100 MW capacity (capacity factor 0.011 --- barely running, potential maintenance issues)
 
 ### Method 2: Local Outlier Factor (LOF)
-LOF measures local deviation: how much does a point's density differ
-from its neighbors? A coal plant with 1.1 tons/MWh carbon intensity
-isn't globally unusual, but if all nearby coal plants have 0.95
-tons/MWh, it's a *local* outlier.
+LOF measures local deviation: how much does a point's density differ from its neighbors? A coal plant with 1.1 tons/MWh carbon intensity isn't globally unusual, but if all nearby coal plants have 0.95 tons/MWh, it's a *local* outlier.
 
 ```python
 from sklearn.neighbors import LocalOutlierFactor
@@ -156,21 +127,15 @@ plants_2023.loc[X.index, 'lof_score'] = lof_scores
 print(f"LOF detected {(lof_predictions == -1).sum()} anomalies")
 ```
 
-LOF finds 614 anomalies, with 68% agreement with Isolation Forest. The
-32% disagreement is valuable --- different methods catch different types
-of anomalies.
+LOF finds 614 anomalies, with 68% agreement with Isolation Forest. The 32% disagreement is valuable --- different methods catch different types of anomalies.
 
 LOF catches contextual anomalies Isolation Forest misses:
 
-- A natural gas combined cycle with 0.65 tons/MWh (globally normal, but
-  30% higher than similar plants --- inefficient operations)
-- A biomass plant with capacity factor 0.85 (typical for baseload, but
-  unusual for biomass which usually runs 0.4--0.6)
+- A natural gas combined cycle with 0.65 tons/MWh (globally normal, but 30% higher than similar plants --- inefficient operations)
+- A biomass plant with capacity factor 0.85 (typical for baseload, but unusual for biomass which usually runs 0.4--0.6)
 
 ### Method 3: Autoencoder Neural Network
-Autoencoders learn to compress data then reconstruct it. They're trained
-only on "normal" data. When you feed them an anomaly, reconstruction
-fails --- high reconstruction error indicates anomalousness.
+Autoencoders learn to compress data then reconstruct it. They're trained only on "normal" data. When you feed them an anomaly, reconstruction fails --- high reconstruction error indicates anomalousness.
 
 ```python
 from tensorflow import keras
@@ -208,21 +173,15 @@ print(f"Autoencoder detected {ae_predictions.sum()} anomalies")
 print(f"Threshold: {threshold:.4f}")
 ```
 
-The autoencoder flags 597 anomalies. Plants with highest reconstruction
-error:
+The autoencoder flags 597 anomalies. Plants with highest reconstruction error:
 
-- Nuclear plant with capacity factor 0.12 (most nuclear runs
-  \>90% --- suggests extended outage or decommissioning)
-- Coal plant with extremely low carbon intensity (0.31
-  tons/MWh --- impossible for coal, likely has biomass co-firing not
-  properly reported)
+- Nuclear plant with capacity factor 0.12 (most nuclear runs \>90% --- suggests extended outage or decommissioning)
+- Coal plant with extremely low carbon intensity (0.31 tons/MWh --- impossible for coal, likely has biomass co-firing not properly reported)
 
-The autoencoder excels at finding *multivariate* anomalies --- plants
-normal on each individual feature but unusual in combination.
+The autoencoder excels at finding *multivariate* anomalies --- plants normal on each individual feature but unusual in combination.
 
 ### Method 4: DBSCAN Clustering
-DBSCAN (Density-Based Spatial Clustering) groups dense regions into
-clusters. Points not in any cluster are noise/outliers.
+DBSCAN (Density-Based Spatial Clustering) groups dense regions into clusters. Points not in any cluster are noise/outliers.
 
 ```python
 from sklearn.cluster import DBSCAN
@@ -238,14 +197,11 @@ print(f"DBSCAN found {n_clusters} clusters")
 print(f"Noise points (anomalies): {n_noise} ({n_noise/len(cluster_labels)*100:.1f}%)")
 ```
 
-DBSCAN identifies 743 anomalies (5.9%). It finds plants that don't fit
-into any natural cluster:
+DBSCAN identifies 743 anomalies (5.9%). It finds plants that don't fit into any natural cluster:
 
-- Hybrid plants (gas + solar) don't cluster well with either pure gas
-  or pure solar
+- Hybrid plants (gas + solar) don't cluster well with either pure gas or pure solar
 - Plants in transition (retiring coal units, adding renewables)
-- Unique technologies (waste-to-energy, geothermal in unusual
-  configurations)
+- Unique technologies (waste-to-energy, geothermal in unusual configurations)
 
 ### Method 5: Statistical Methods
 Sometimes simple is best. Three classical statistical approaches:
@@ -275,8 +231,7 @@ def detect_outliers_iqr(data):
     return (data < Q1 - 1.5*IQR) | (data > Q3 + 1.5*IQR)
 ```
 
-Modified Z-Score: Uses median absolute deviation (more robust to
-outliers)
+Modified Z-Score: Uses median absolute deviation (more robust to outliers)
 
 ```python
 def detect_outliers_mad(data, threshold=3.5):
@@ -292,12 +247,10 @@ Results:
 - Capacity factor: 734 outliers by Z-score, 891 by IQR
 - Generation: 628 outliers by Z-score, 847 by IQR
 
-Statistical methods are fast (milliseconds) and interpretable, but only
-catch univariate outliers.
+Statistical methods are fast (milliseconds) and interpretable, but only catch univariate outliers.
 
 ### The Power of Ensembles
-Different methods catch different anomalies. Combine them for robust
-detection:
+Different methods catch different anomalies. Combine them for robust detection:
 
 ``` 
 # Create voting system
@@ -331,16 +284,12 @@ Ensemble Results:
 The 8 plants where all methods agree are the most suspicious:
 
 1.  [Coal plant, capacity factor 1.67 (physically impossible)]
-2.  [Gas plant, carbon intensity 4.1 tons/MWh (should be
-    \~0.4--0.6)]
+2.  [Gas plant, carbon intensity 4.1 tons/MWh (should be \~0.4--0.6)]
 3.  [Nuclear plant, capacity factor 0.03 (essentially offline)]
-4.  [Solar farm, negative emissions (data error) 5--8. Various plants
-    with impossible combinations of
-    generation/capacity/emissions]
+4.  [Solar farm, negative emissions (data error) 5--8. Various plants with impossible combinations of generation/capacity/emissions]
 
 ### Root Cause Analysis
-Finding anomalies is step one. Understanding *why* they're anomalous is
-step two.
+Finding anomalies is step one. Understanding *why* they're anomalous is step two.
 
 ```python
 def analyze_anomaly(plant_row, population_stats):
@@ -369,80 +318,45 @@ for idx, row in high_confidence.head(10).iterrows():
 
 Output reveals patterns:
 
-- 47% of anomalies: Impossible capacity factors (data quality
-  issues)
-- 23% of anomalies: Extremely high/low carbon intensity (fuel
-  misreporting, CCS, co-firing)
-- 18% of anomalies: Unusual generation patterns (maintenance, partial
-  operation)
-- 12% of anomalies: Complex multivariate anomalies (no single feature
-  stands out)
+- 47% of anomalies: Impossible capacity factors (data quality issues)
+- 23% of anomalies: Extremely high/low carbon intensity (fuel misreporting, CCS, co-firing)
+- 18% of anomalies: Unusual generation patterns (maintenance, partial operation)
+- 12% of anomalies: Complex multivariate anomalies (no single feature stands out)
 
 ### Practical Applications
 1\. Data Quality Auditing
 
-Flag the 8 plants where all methods agree for immediate investigation.
-These are almost certainly data errors requiring correction before any
-analysis.
+Flag the 8 plants where all methods agree for immediate investigation. These are almost certainly data errors requiring correction before any analysis.
 
 2\. Regulatory Compliance
 
-The 47 plants with 4+ votes warrant regulatory review. Are they
-misreporting? Equipment problems? Unusual circumstances requiring
-verification?
+The 47 plants with 4+ votes warrant regulatory review. Are they misreporting? Equipment problems? Unusual circumstances requiring verification?
 
 3\. Predictive Maintenance
 
-Plants with efficiency 2+ std deviations below similar facilities might
-have equipment degradation. Schedule inspection before catastrophic
-failure.
+Plants with efficiency 2+ std deviations below similar facilities might have equipment degradation. Schedule inspection before catastrophic failure.
 
 4\. Investment Due Diligence
 
-Before acquiring a plant, check if it's flagged by anomaly detection. A
-plant with 3+ anomaly votes needs deeper investigation of operational
-issues, regulatory risk, or data quality.
+Before acquiring a plant, check if it's flagged by anomaly detection. A plant with 3+ anomaly votes needs deeper investigation of operational issues, regulatory risk, or data quality.
 
 ### Lessons Learned
-1\. No single method catches everything: Isolation Forest found 68% of
-ultimate anomalies, but missed 32% caught by other methods. Use
-ensembles.
+1\. No single method catches everything: Isolation Forest found 68% of ultimate anomalies, but missed 32% caught by other methods. Use ensembles.
 
-2\. Context matters: LOF's local analysis caught plants normal globally
-but unusual locally. Understand *why* something is anomalous, not just
-*that* it is.
+2\. Context matters: LOF's local analysis caught plants normal globally but unusual locally. Understand *why* something is anomalous, not just *that* it is.
 
-3\. Interpretability helps: Statistical methods are less sophisticated
-but easier to explain to stakeholders. "This plant is 4.2 standard
-deviations above the mean" resonates more than "the autoencoder
-reconstruction error is 0.0847."
+3\. Interpretability helps: Statistical methods are less sophisticated but easier to explain to stakeholders. "This plant is 4.2 standard deviations above the mean" resonates more than "the autoencoder reconstruction error is 0.0847."
 
-4\. Domain knowledge guides investigation: Knowing coal plants should
-have 0.9--1.1 tons/MWh carbon intensity helps interpret results. Pure ML
-misses this context.
+4\. Domain knowledge guides investigation: Knowing coal plants should have 0.9--1.1 tons/MWh carbon intensity helps interpret results. Pure ML misses this context.
 
-5\. Automate the easy stuff: Let algorithms flag the most suspicious 5%.
-Then apply human expertise to investigate those 631 plants rather than
-all 12,613.
+5\. Automate the easy stuff: Let algorithms flag the most suspicious 5%. Then apply human expertise to investigate those 631 plants rather than all 12,613.
 
 ### So What?
-Anomaly detection transforms 12,613 plants into a manageable
-investigation queue. Instead of random audits, focus resources on the
-234 high-confidence anomalies. This targeted approach:
+Anomaly detection transforms 12,613 plants into a manageable investigation queue. Instead of random audits, focus resources on the 234 high-confidence anomalies. This targeted approach:
 
 - Improves data quality by catching reporting errors
-- Enables predictive maintenance by spotting equipment degradation
-  early
+- Enables predictive maintenance by spotting equipment degradation early
 - Reduces regulatory burden by automating compliance checks
 - Informs better decisions by ensuring analysis uses clean data
 
-The ensemble approach demonstrated here achieves 94% precision (94% of
-flagged plants truly are anomalous) with 89% recall (catches 89% of real
-anomalies). That's production-ready performance.
-::::::::By [Kyle Jones](https://medium.com/@kyle-t-jones) on
-[October 6, 2025](https://medium.com/p/1c5b18e2a56f).
-
-[Canonical
-link](https://medium.com/@kyle-t-jones/finding-the-needles-anomaly-detection-in-power-plant-operations-1c5b18e2a56f)
-
-Exported from [Medium](https://medium.com) on November 10, 2025.
+The ensemble approach demonstrated here achieves 94% precision (94% of flagged plants truly are anomalous) with 89% recall (catches 89% of real anomalies). That's production-ready performance.
