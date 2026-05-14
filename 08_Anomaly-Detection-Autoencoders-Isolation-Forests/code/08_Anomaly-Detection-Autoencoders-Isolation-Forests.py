@@ -236,11 +236,8 @@ plt.savefig('anomaly_comparison.png', dpi=300, bbox_inches='tight')
 plt.show()
 
 # Summary
-logger.info("\n" + "="*60)
-logger.info("ANOMALY DETECTION COMPARISON")
-logger.info("="*60)
+logger.info("=== ANOMALY DETECTION COMPARISON ===")
 logger.info(f"{'Method':<20} {'Anomalies':<15} {'Rate (%)':<15}")
-logger.info("-"*60)
 logger.info(f"{'Isolation Forest':<20} {anomalies_iso.sum():<15} {anomalies_iso.mean()*100:<15.2f}")
 logger.info(f"{'Autoencoder':<20} {anomalies_ae_full.sum():<15} {anomalies_ae_full.mean()*100:<15.2f}")
 logger.info(f"{'Statistical':<20} {anomalies_stat.sum():<15} {anomalies_stat.mean()*100:<15.2f}")
