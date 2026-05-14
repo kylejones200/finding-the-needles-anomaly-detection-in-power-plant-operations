@@ -9,7 +9,7 @@ We compare three approaches on Oklahoma energy production data: isolation forest
 We use energy production data that may contain anomalies from equipment failures or data issues.
 
 
-The series contains **54 annual observations from 1970–2023**, representing Oklahoma energy production totals. This horizon is long enough to include structural shifts and potential data issues, but short enough to manually review flagged anomalies for validation.
+The series contains 54 annual observations from 1970–2023, representing Oklahoma energy production totals. This horizon is long enough to include structural shifts and potential data issues, but short enough to manually review flagged anomalies for validation.
 ### Method 1: Isolation Forest
 Isolation Forest identifies outliers by isolating them in feature space.
 
@@ -40,9 +40,9 @@ We compare all methods and visualize detected anomalies.
 
 On the Oklahoma production series, the methods behaved quite differently:
 
-- **Isolation Forest** flagged **6 anomalies**, corresponding to about **11.1%** of the observations.  
-- The **autoencoder** identified **12 anomaly periods**, or roughly **22.2%** of the series, making it the most sensitive method.  
-- The **statistical baselines** (Z-score, IQR, moving-average rules) detected **no anomalies** under the chosen thresholds.
+- Isolation Forest flagged 6 anomalies, corresponding to about 11.1% of the observations.  
+- The autoencoder identified 12 anomaly periods, or roughly 22.2% of the series, making it the most sensitive method.  
+- The statistical baselines (Z-score, IQR, moving-average rules) detected no anomalies under the chosen thresholds.
 
 The combined plot in `anomaly_comparison.png` overlays all three methods’ flags on the time series, making it easy to see where they agree (strong candidates) versus where only the more sensitive autoencoder fires (likely contextual or borderline anomalies).
 

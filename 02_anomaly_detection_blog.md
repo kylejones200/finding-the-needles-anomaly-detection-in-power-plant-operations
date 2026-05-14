@@ -2,7 +2,7 @@
 
 *Using ensemble machine learning to automatically detect unusual emissions, data errors, and equipment malfunctions across 12,000+ U.S. power plants*
 
-**Kyle Jones**  
+Kyle Jones  
 10 min read · Oct 6, 2025
 
 ---
@@ -15,13 +15,13 @@ This article demonstrates six different anomaly detection techniques on real EPA
 
 ## Why Anomaly Detection Matters
 
-**For Regulators:** The EPA receives emissions reports from thousands of facilities. Manually auditing all of them is impossible. Anomaly detection helps prioritize which plants warrant detailed investigation, catching misreporting, equipment issues, or compliance violations.
+For Regulators: The EPA receives emissions reports from thousands of facilities. Manually auditing all of them is impossible. Anomaly detection helps prioritize which plants warrant detailed investigation, catching misreporting, equipment issues, or compliance violations.
 
-**For Utility Operators:** A plant with efficiency 20% below similar facilities could have equipment problems. Early detection enables predictive maintenance before catastrophic failure, saving millions in emergency repairs and lost generation.
+For Utility Operators: A plant with efficiency 20% below similar facilities could have equipment problems. Early detection enables predictive maintenance before catastrophic failure, saving millions in emergency repairs and lost generation.
 
-**For Investors:** Unusual emissions patterns might indicate operational problems, regulatory risk, or aging equipment. This information helps assess asset quality and avoid bad investments.
+For Investors: Unusual emissions patterns might indicate operational problems, regulatory risk, or aging equipment. This information helps assess asset quality and avoid bad investments.
 
-**For Researchers:** Identifying outliers improves data quality for analysis. That plant reporting negative emissions? Probably a data entry error that would skew your results.
+For Researchers: Identifying outliers improves data quality for analysis. That plant reporting negative emissions? Probably a data entry error that would skew your results.
 
 ![Visualization of normal vs anomalous plants in feature space](anomaly_scatter.png)
 
@@ -68,7 +68,7 @@ Some immediate red flags appear in the raw data. 47 plants show capacity factor 
 
 Isolation Forest works on a clever principle: anomalies are easier to isolate than normal points. It randomly selects features and split values, recursively partitioning the data. Anomalies get isolated in fewer splits (shorter tree paths).
 
-**Why It Works**
+Why It Works
 
 Normal points are densely packed—requires many splits to isolate them. Anomalies are in sparse regions—one or two splits isolate them.
 
@@ -129,7 +129,7 @@ print(f"LOF detected {(lof_predictions == -1).sum()} anomalies")
 
 LOF finds 614 anomalies, with 68% agreement with Isolation Forest. The 32% disagreement is valuable—different methods catch different types of anomalies.
 
-**LOF catches contextual anomalies Isolation Forest misses:**
+LOF catches contextual anomalies Isolation Forest misses:
 - A natural gas combined cycle with 0.65 tons/MWh (globally normal, but 30% higher than similar plants—inefficient operations)
 - A biomass plant with capacity factor 0.85 (typical for baseload, but unusual for biomass which usually runs 0.4-0.6)
 
@@ -215,7 +215,7 @@ DBSCAN identifies 743 anomalies (5.9%). It finds plants that don't fit into any 
 
 Sometimes simple is best. Three classical statistical approaches:
 
-**Z-Score Method:** Flag points beyond 3 standard deviations from mean
+Z-Score Method: Flag points beyond 3 standard deviations from mean
 
 ```python
 from scipy import stats
@@ -231,7 +231,7 @@ for feature in ['carbon_intensity', 'capacity_factor', 'log_generation']:
     print(f"{feature}: {outliers.sum()} outliers ({outliers.sum()/len(outliers)*100:.1f}%)")
 ```
 
-**IQR Method:** Flag points beyond 1.5 × IQR from quartiles
+IQR Method: Flag points beyond 1.5 × IQR from quartiles
 
 ```python
 def detect_outliers_iqr(data):
@@ -241,7 +241,7 @@ def detect_outliers_iqr(data):
     return (data < Q1 - 1.5*IQR) | (data > Q3 + 1.5*IQR)
 ```
 
-**Modified Z-Score:** Uses median absolute deviation (more robust to outliers)
+Modified Z-Score: Uses median absolute deviation (more robust to outliers)
 
 ```python
 def detect_outliers_mad(data, threshold=3.5):
@@ -252,9 +252,9 @@ def detect_outliers_mad(data, threshold=3.5):
 ```
 
 Results:
-- **Carbon intensity:** 892 outliers by Z-score, 1,103 by IQR
-- **Capacity factor:** 734 outliers by Z-score, 891 by IQR
-- **Generation:** 628 outliers by Z-score, 847 by IQR
+- Carbon intensity: 892 outliers by Z-score, 1,103 by IQR
+- Capacity factor: 734 outliers by Z-score, 891 by IQR
+- Generation: 628 outliers by Z-score, 847 by IQR
 
 Statistical methods are fast (milliseconds) and interpretable, but only catch univariate outliers.
 
@@ -329,19 +329,19 @@ Output reveals clear patterns. 47% of anomalies show impossible capacity factors
 
 ## Practical Applications
 
-**1. Data Quality Auditing**
+1. Data Quality Auditing
 
 Flag the 8 plants where all methods agree for immediate investigation. These are almost certainly data errors requiring correction before any analysis.
 
-**2. Regulatory Compliance**
+2. Regulatory Compliance
 
 The 47 plants with 4+ votes warrant regulatory review. Are they misreporting? Equipment problems? Unusual circumstances requiring verification?
 
-**3. Predictive Maintenance**
+3. Predictive Maintenance
 
 Plants with efficiency 2+ std deviations below similar facilities might have equipment degradation. Schedule inspection before catastrophic failure.
 
-**4. Investment Due Diligence**
+4. Investment Due Diligence
 
 Before acquiring a plant, check if it's flagged by anomaly detection. A plant with 3+ anomaly votes needs deeper investigation of operational issues, regulatory risk, or data quality.
 
@@ -365,10 +365,10 @@ For production anomaly detection systems, follow these guidelines. Run multiple 
 
 Anomaly detection transforms 12,613 plants into a manageable investigation queue. Instead of random audits, focus resources on the 234 high-confidence anomalies. This targeted approach:
 
-- **Improves data quality** by catching reporting errors
-- **Enables predictive maintenance** by spotting equipment degradation early
-- **Reduces regulatory burden** by automating compliance checks
-- **Informs better decisions** by ensuring analysis uses clean data
+- Improves data quality by catching reporting errors
+- Enables predictive maintenance by spotting equipment degradation early
+- Reduces regulatory burden by automating compliance checks
+- Informs better decisions by ensuring analysis uses clean data
 
 The ensemble approach demonstrated here achieves 94% precision (94% of flagged plants truly are anomalous) with 89% recall (catches 89% of real anomalies). Nice.
 
@@ -376,7 +376,7 @@ Ready to implement anomaly detection on your own data? Start with Isolation Fore
 
 ---
 
-**Anomaly Detection** · **Machine Learning** · **Python** · **Data Quality** · **Energy**
+Anomaly Detection · Machine Learning · Python · Data Quality · Energy
 
 ---
 
