@@ -160,7 +160,6 @@ logger.info(f"  Z-score: {methods['z_score'].sum()}")
 logger.info(f"  IQR: {methods['iqr'].sum()}")
 logger.info(f"  Moving avg: {methods['moving_avg'].sum()}")
 
-from sklearn.metrics import precision_recall_curve, roc_curve, auc
 
 def evaluate_anomaly_detection(scores, threshold, actual_anomalies=None):
     """Evaluate anomaly detection with different thresholds"""
@@ -192,7 +191,7 @@ threshold_df = pd.DataFrame(results)
 # Visualize threshold selection
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.plot(threshold_df['threshold'], threshold_df['anomaly_rate'], linewidth=2)
-ax.axvline(threshold_ae, color='red', linestyle='--', label=f'Selected (95th percentile)')
+ax.axvline(threshold_ae, color='red', linestyle='--', label='Selected (95th percentile)')
 ax.set_xlabel('Reconstruction Error Threshold', fontsize=11)
 ax.set_ylabel('Anomaly Rate', fontsize=11)
 ax.set_title('Threshold Selection for Autoencoder', fontsize=13, fontweight='bold')
