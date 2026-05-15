@@ -1,0 +1,11 @@
+[project]
+name = "finding-the-needles-anomaly-detection-in-power-pla"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "anomsmith>=0.0.2",
+    "matplotlib>=3.10.9",
+    "pandas>=3.0.3",
+    "plotsmith>=0.1.5",
+    "scikit-learn>=1.8.0",
+]
