@@ -1,0 +1,22 @@
+# Paths are relative to the repository root unless absolute.
+
+data:
+  # Annual production by year columns (e.g. EPA / state export)
+  production_csv: data/pr_OK.csv
+
+  # NAB benchmark (optional override)
+  nab_temperature_url: null
+
+output:
+  root: output
+  figures_dir: figures
+  tables_dir: tables
+
+compare:
+  contamination: 0.05
+  quantile: 0.95
+
+timeseries:
+  window_size: 10
+  contamination: 0.1
+  ae_percentile: 95

@@ -1,3 +1,12 @@
+# Generated artifacts
+output/figures/
+output/tables/
+!output/README.md
+
+# Local data (keep README)
+data/*
+!data/README.md
+
 # Python
 __pycache__/
 *.pyc
@@ -9,6 +18,8 @@ env/
 dist/
 build/
 .ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
 
 # Node
 node_modules/
@@ -22,7 +33,7 @@ node_modules/
 .vscode/
 .idea/
 *.swp
-# Secrets 
+# Secrets
 .env.*
 !.env.example
 credentials.json

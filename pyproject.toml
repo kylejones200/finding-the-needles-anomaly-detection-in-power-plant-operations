@@ -1,11 +1,50 @@
 [project]
-name = "finding-the-needles-anomaly-detection-in-power-pla"
-version = "0.1.0"
+name = "power-plant-anomaly"
+version = "0.2.0"
+description = "Anomaly detection for power plant operations and production time series"
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "anomsmith>=0.0.2",
     "matplotlib>=3.10.9",
+    "numpy>=2.4.4",
     "pandas>=3.0.3",
-    "plotsmith>=0.1.5",
+    "pyyaml>=6.0",
     "scikit-learn>=1.8.0",
+    "torch>=2.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.9",
+]
+
+[project.optional-dependencies]
+viz = [
+    "plotsmith>=0.1.5",
+]
+
+[project.scripts]
+plant-anomaly = "power_plant_anomaly.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/power_plant_anomaly"]
+
+[tool.uv]
+package = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
