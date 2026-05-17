@@ -69,3 +69,11 @@ uv run ruff check src tests
 | `uv` not found | [Install uv](https://docs.astral.sh/uv/getting-started/installation/) |
 | Missing `pr_OK.csv` | Use `--demo` or add the file under `data/` |
 | Headless / SSH | Use `--save-plots` instead of `--plot` |
+
+## Disclaimer
+
+Educational/demo code only. Not financial, safety, or engineering advice. Use at your own risk. Verify results independently before any production or operational use.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
