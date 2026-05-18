@@ -27,17 +27,13 @@ def run_model_comparison(
     df, ground_truth = load_nab_temperature()
     y = df["value"]
     threshold_rule = am.ThresholdRule(method="quantile", value=quantile, quantile=quantile)
-
     detectors = {
-        "IsolationForest": am.IsolationForestDetector(
-            contamination=contamination, random_state=42
-        ),
+        "IsolationForest": am.IsolationForestDetector(contamination=contamination, random_state=42),
         "LOF": am.LOFDetector(contamination=contamination, random_state=42),
         "PCA": am.PCADetector(contamination=contamination, random_state=42),
         "ZScore": am.ZScoreScorer(),
         "IQR": am.IQRScorer(),
     }
-
     results: dict[str, Any] = {}
     for name, detector in detectors.items():
         detector.fit(y)
@@ -73,7 +69,6 @@ def run_model_comparison(
         }
     ).T
     logger.info("\n%s", summary)
-
     saved: dict[str, Path] = {}
     if figures_dir is not None:
         figures_dir.mkdir(parents=True, exist_ok=True)

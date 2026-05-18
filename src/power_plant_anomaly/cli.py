@@ -78,9 +78,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=str(DEFAULT_CONFIG_PATH),
         help="Path to config.yaml",
     )
-
     sub = parser.add_subparsers(dest="command", required=True)
-
     compare = sub.add_parser(
         "compare",
         help="Compare anomsmith detectors on NAB machine-temperature data",
@@ -92,7 +90,6 @@ def build_parser() -> argparse.ArgumentParser:
     )
     compare.add_argument("--plot", action="store_true", help="Show interactive plots")
     compare.set_defaults(func=cmd_compare)
-
     ts = sub.add_parser(
         "timeseries",
         help="Isolation Forest, autoencoder, and statistical detection on annual production",
@@ -101,7 +98,6 @@ def build_parser() -> argparse.ArgumentParser:
     ts.add_argument("--save-plots", action="store_true", help="Write figures to output/figures/")
     ts.add_argument("--plot", action="store_true", help="Show interactive plots")
     ts.set_defaults(func=cmd_timeseries)
-
     return parser
 
 

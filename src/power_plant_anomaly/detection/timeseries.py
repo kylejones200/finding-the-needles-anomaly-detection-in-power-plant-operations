@@ -127,12 +127,10 @@ def run_timeseries_detection(
         n_estimators=100,
     )
     anomalies_iso = iso.fit_predict(features_scaled) == -1
-
     sequences = _create_sequences(ts.values, window_size)
     scaler_ae = StandardScaler()
     x_scaled = scaler_ae.fit_transform(sequences.reshape(-1, 1)).reshape(sequences.shape)
     x_flat = x_scaled.reshape(len(x_scaled), -1)
-
     torch.manual_seed(random_state)
     model = DenseAutoencoder(input_dim=window_size, encoding_dim=5)
     _train_autoencoder(model, x_flat)
@@ -148,7 +146,6 @@ def run_timeseries_detection(
             anomalies_ae[i : i + window_size] = True
 
     anomalies_stat = detect_statistical(ts)
-
     thresholds = np.linspace(reconstruction_error.min(), reconstruction_error.max(), 50)
     threshold_df = pd.DataFrame(
         {
@@ -157,7 +154,6 @@ def run_timeseries_detection(
             "anomaly_rate": [(reconstruction_error > t).mean() for t in thresholds],
         }
     )
-
     logger.info(
         "Isolation Forest: %d anomalies (%.2f%%)",
         anomalies_iso.sum(),
@@ -173,7 +169,6 @@ def run_timeseries_detection(
         anomalies_stat.sum(),
         100 * anomalies_stat.mean(),
     )
-
     return TimeseriesDetectionResult(
         ts=ts,
         anomalies_iso=anomalies_iso,
