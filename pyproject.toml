@@ -49,3 +49,10 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
+
+# Optional Rust extension — build with:
+#   pip install maturin && maturin develop --release -m rust/py/Cargo.toml
+[tool.maturin]
+manifest-path = "rust/py/Cargo.toml"
+module-name = "finding_the_needles_anomaly_detection_in_power_plant_operations_rs"
+

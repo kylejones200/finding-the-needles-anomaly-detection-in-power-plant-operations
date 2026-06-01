@@ -3,6 +3,12 @@
 from __future__ import annotations
 
 import logging
+import sys
+from pathlib import Path as _Path
+
+_src_root = _Path(__file__).resolve().parents[2]
+if str(_src_root) not in sys.path:
+    sys.path.insert(0, str(_src_root))
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -204,3 +210,23 @@ def save_timeseries_figures(
         ),
     }
     return paths
+
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    np.random.seed(42)
+    ts = pd.Series(
+        np.sin(np.linspace(0, 20, 120)) + np.random.normal(0, 0.1, 120),
+        index=pd.date_range("2010-01-01", periods=120, freq="MS"),
+    )
+    result = run_timeseries_detection(ts, window_size=5)
+    logger.info(
+        "Detection complete: iso=%d ae=%d stat=%d",
+        result.anomalies_iso.sum(),
+        result.anomalies_ae.sum(),
+        result.anomalies_stat.sum(),
+    )
+
+
+if __name__ == "__main__":
+    main()

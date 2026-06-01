@@ -1,0 +1,13 @@
+[package]
+name = "finding_the_needles_anomaly_detection_in_power_plant_operations_bench"
+description = "Standalone Rust benchmark (no Python)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bench"
+path = "src/main.rs"
+
+[dependencies]
+finding_the_needles_anomaly_detection_in_power_plant_operations_core = { path = "../core" }

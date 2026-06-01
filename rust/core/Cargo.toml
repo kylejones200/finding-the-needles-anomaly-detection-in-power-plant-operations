@@ -1,0 +1,9 @@
+[package]
+name = "finding_the_needles_anomaly_detection_in_power_plant_operations_core"
+description = "Rolling z-score anomaly flags"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

@@ -1,0 +1,15 @@
+[package]
+name = "finding_the_needles_anomaly_detection_in_power_plant_operations_rs"
+description = "Python bindings (PyO3) for finding_the_needles_anomaly_detection_in_power_plant_operations_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "finding_the_needles_anomaly_detection_in_power_plant_operations_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+finding_the_needles_anomaly_detection_in_power_plant_operations_core = { path = "../core" }
+pyo3 = { version = "0.28", features = ["extension-module"] }
+numpy = "0.28"
